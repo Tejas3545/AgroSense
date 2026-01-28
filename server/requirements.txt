@@ -1,0 +1,21 @@
+Flask
+Flask-CORS
+python-dotenv
+requests
+google-generativeai
+fpdf
+reportlab
+transformers
+torch
+pillow
+torchvision
+accelerate
+sentencepiece
+protobuf==3.20.3
+deep-translator
+
+# Security Dependencies
+PyJWT==2.8.0
+redis==5.0.1
+cryptography==41.0.7
+flask-talisman==1.1.0
