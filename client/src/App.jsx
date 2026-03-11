@@ -54,10 +54,11 @@ function App() {
 
   const toggleTheme = () => setIsDark(!isDark)
 
-  // API Config - Auto-detect if accessed via ngrok
-  const API_BASE_URL = window.location.hostname.includes('ngrok')
-    ? `${window.location.protocol}//${window.location.hostname}/api`
-    : 'http://localhost:8000/api'
+  // API Config - Use environment variable or fallback
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 
+    (window.location.hostname.includes('ngrok')
+      ? `${window.location.protocol}//${window.location.hostname}/api`
+      : 'http://localhost:8000/api')
 
   // --- Logic --- (Kept from original)
   const analyzePlantDisease = async (imageData) => {
