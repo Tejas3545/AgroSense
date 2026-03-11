@@ -1,4 +1,4 @@
-# AgriHealth AI: Crop Disease Diagnostics for Underserved Farming Communities
+# AgroSense: Crop Disease Diagnostics for Underserved Farming Communities
 
 > **AI-Enabled Healthcare Diagnostics for Underserved Regions**  
 > Empowering farmers in rural and remote areas with instant, AI-powered crop disease identification and treatment recommendations
