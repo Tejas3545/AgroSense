@@ -1,34 +1,11 @@
-import { motion } from 'framer-motion'
-
 export default function ThemeToggle({ isDark, toggle }) {
     return (
         <button
             onClick={toggle}
             className="theme-toggle"
             aria-label="Toggle Dark Mode"
-            style={{
-                position: 'fixed',
-                top: 'var(--space-md)',
-                right: 'var(--space-md)',
-                zIndex: 1000,
-                background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '50%',
-                width: '48px',
-                height: '48px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: 'var(--shadow-soft)',
-                color: 'var(--color-text-main)'
-            }}
         >
-            <motion.div
-                initial={false}
-                animate={{ rotate: isDark ? 180 : 0, scale: isDark ? 0.8 : 1 }}
-                transition={{ duration: 0.3 }}
-            >
+            <div>
                 {isDark ? (
                     /* Moon Icon */
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -48,7 +25,7 @@ export default function ThemeToggle({ isDark, toggle }) {
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 )}
-            </motion.div>
+            </div>
         </button>
     )
 }

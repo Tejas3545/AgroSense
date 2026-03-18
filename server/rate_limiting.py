@@ -272,12 +272,8 @@ def rate_limit(limit: Optional[int] = None, window: int = 60, per: str = 'ip'):
                 # If response is a tuple, extract the response object
                 if isinstance(response, tuple):
                     response_obj = response[0]
-                    status_code = response[1] if len(response) > 1 else 200
-                    headers = response[2] if len(response) > 2 else {}
                 else:
                     response_obj = response
-                    status_code = 200
-                    headers = {}
                 
                 # Add rate limit headers
                 if hasattr(response_obj, 'headers'):

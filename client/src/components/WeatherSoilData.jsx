@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { t } from '../translations'
 import { API_BASE_URL } from '../config/api'
 import { WarningIcon, WeatherIcon, SoilIcon, ClipboardIcon, CheckCircleIcon, DropletIcon, ThermometerIcon, CloudRainIcon, FlaskIcon, SeedlingIcon, LightbulbIcon } from './Icons'
@@ -25,11 +25,7 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
 
   const location = 'Rajkot, Gujarat' // Default location
 
-  useEffect(() => {
-    fetchEnvironmentalData()
-  }, [location])
-
-  const fetchEnvironmentalData = async () => {
+  const fetchEnvironmentalData = useCallback(async () => {
     setLoading(true)
     setError(null)
     
@@ -44,7 +40,11 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchEnvironmentalData()
+  }, [fetchEnvironmentalData])
 
   const fetchWeatherData = async () => {
     try {
@@ -160,7 +160,7 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
           ← Back to Home
         </button>
       </div>
-      <h3>🌍 Environmental Conditions</h3>
+      <h3>{language === 'gujarati' ? 'પર્યાવરણીય પરિસ્થિતિઓ' : 'Environmental Conditions'}</h3>
       
       <div className="data-grid">
         <div className="weather-card">

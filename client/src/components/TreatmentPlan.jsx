@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion' // eslint-disable-line no-unused-vars
 import { t } from '../translations'
 
 export default function TreatmentPlan({ remedies, language = 'english' }) {
@@ -78,8 +78,8 @@ export default function TreatmentPlan({ remedies, language = 'english' }) {
                                 fontSize: 'var(--text-small)',
                                 color: 'var(--color-stone)'
                             }}>
-                                <span>⏱ {remedy.timeframe}</span>
-                                <span>✓ {remedy.effectiveness}% {t('effective', language)}</span>
+                                <span>{language === 'gujarati' ? 'સમય' : 'Time'}: {remedy.timeframe}</span>
+                                <span>{language === 'gujarati' ? 'અસરકારકતા' : 'Effectiveness'}: {remedy.effectiveness}% {t('effective', language)}</span>
                             </div>
                         </div>
                     </motion.div>

@@ -100,11 +100,6 @@ export const translations = {
     potassium: "Potassium",
     recommendations: "Agricultural Recommendations",
     
-    // Voice Assistant
-    voiceAssistant: "Voice Assistant",
-    listening: "Listening...",
-    speak: "Speak",
-    
     // Severity Levels
     critical: "Critical",
     high: "High",
@@ -212,11 +207,6 @@ export const translations = {
     phosphorus: "ફોસ્ફરસ",
     potassium: "પોટેશિયમ",
     recommendations: "કૃષિ ભલામણો",
-    
-    // Voice Assistant
-    voiceAssistant: "વૉઇસ સહાયક",
-    listening: "સાંભળી રહ્યું છે...",
-    speak: "બોલો",
     
     // Severity Levels
     critical: "ગંભીર",

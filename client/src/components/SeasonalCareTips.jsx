@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion' // eslint-disable-line no-unused-vars
 import { t } from '../translations'
 import { LeafHealthIcon, SunIcon, SnowflakeIcon } from './SeasonalIcons'
 import { AutumnIcon } from './Icons'

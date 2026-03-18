@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion' // eslint-disable-line no-unused-vars
 import { useMemo, useState } from 'react'
 import { t } from '../translations'
 
@@ -151,7 +151,7 @@ export default function DetailedCareGuide({ prescribedCare, language = 'english'
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.05, duration: 0.3 }}
                       >
-                        <span className="list-marker">✓</span>
+                        <span className="list-marker" aria-hidden="true">•</span>
                         {item}
                       </motion.li>
                     ))}
@@ -184,7 +184,7 @@ export default function DetailedCareGuide({ prescribedCare, language = 'english'
 
       <div className="care-guide__note">
         <p>
-          <strong>📌 {t('importantNote', language)}:</strong> {t('recoveryNote', language)}
+          <strong>{t('importantNote', language)}:</strong> {t('recoveryNote', language)}
         </p>
       </div>
     </div>

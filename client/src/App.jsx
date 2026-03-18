@@ -8,9 +8,8 @@ import ThemeToggle from './components/ThemeToggle'
 import CareOptions from './components/CareOptions'
 import BasicCareTips from './components/BasicCareTips'
 import SeasonalCareTips from './components/SeasonalCareTips'
-import VoiceAssistant from './components/VoiceAssistant'
 import WeatherSoilData from './components/WeatherSoilData'
-import { API_BASE_URL } from './config/api'
+import { API_BASE_URLS } from './config/api'
 import { t } from './translations'
 
 function App() {
@@ -55,10 +54,30 @@ function App() {
 
   const toggleTheme = () => setIsDark(!isDark)
 
+  const fetchWithApiFallback = async (path, options) => {
+    const errors = []
+
+    for (const baseUrl of API_BASE_URLS) {
+      try {
+        const response = await fetch(`${baseUrl}${path}`, options)
+        if (response.ok) {
+          return response
+        }
+
+        const body = await response.text().catch(() => '')
+        errors.push(`${baseUrl}${path} -> ${response.status}${body ? `: ${body}` : ''}`)
+      } catch (error) {
+        errors.push(`${baseUrl}${path} -> ${error.message}`)
+      }
+    }
+
+    throw new Error(`All backend endpoints failed. ${errors.join(' | ')}`)
+  }
+
   // --- Logic --- (Kept from original)
   const analyzePlantDisease = async (imageData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      const response = await fetchWithApiFallback('/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: imageData }),
@@ -79,107 +98,6 @@ function App() {
       alert(`Analysis failed: ${error.message}. Please check that the backend API is reachable.`)
       throw error // Don't fallback to mock data, throw error instead
     }
-  }
-
-  // Generate deterministic hash from image data for consistent results
-  const hashImageData = (imageData) => {
-    let hash = 0
-    for (let i = 0; i < imageData.length; i++) {
-      const char = imageData.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // Convert to 32-bit integer
-    }
-    return Math.abs(hash)
-  }
-
-  const generateMockResult = (imageData) => {
-    const mockDiseases = [
-      {
-        disease: 'Powdery Mildew',
-        confidence: 92,
-        severity: 'high',
-        description: 'Fungal infection causing white powder-like coating on leaves. Common in humid environments with poor air circulation.',
-        plant_name: 'Rosa (Rose)',
-        seasonal_tips: 'In spring, prune back dead wood to encourage vigorous new growth and better airflow.',
-        remedies: [
-          { step: 1, action: 'Remove infected leaves immediately', timeframe: 'Now', effectiveness: 95 },
-          { step: 2, action: 'Apply neem oil spray', timeframe: 'Every 7 days', effectiveness: 88 },
-          { step: 3, action: 'Improve air circulation around plant', timeframe: 'Ongoing', effectiveness: 92 },
-        ],
-        prescribed_care: {
-          overview: 'Powdery mildew is a fungal disease that thrives in warm, dry conditions with poor air circulation. Recovery requires immediate action and consistent treatment.',
-          immediate_actions: [
-            'Isolate the affected plant from other plants to prevent spread',
-            'Remove all visibly infected leaves using sterilized scissors',
-            'Dispose of infected leaves in sealed bags (do not compost)',
-            'Wash your hands and sterilize tools after handling the plant'
-          ],
-          treatment_schedule: [
-            { week: 'Week 1-2', actions: 'Apply neem oil or sulfur dust every 7 days. Monitor for new infections daily.' },
-            { week: 'Week 3-4', actions: 'Continue spraying every 10 days. Prune away crowded branches for better airflow.' },
-            { week: 'Week 5+', actions: 'Reduce spray frequency to every 14 days once no new signs appear for 2 weeks.' }
-          ],
-          environmental_improvements: [
-            'Increase air circulation with a small fan (not directly on plant)',
-            'Reduce humidity to 40-50% using a dehumidifier if needed',
-            'Water only at soil level, never wet the foliage',
-            'Space plants 6-12 inches apart to allow airflow',
-            'Ensure temperatures stay between 65-75°F'
-          ],
-          prevention: [
-            'Water in the morning so foliage dries quickly',
-            'Prune regularly to maintain open canopy structure',
-            'Avoid overcrowding plants in confined spaces',
-            'Monitor new growth weekly for early detection',
-            'Apply preventative neem oil spray monthly during growing season'
-          ]
-        }
-      },
-      {
-        disease: 'Leaf Spot',
-        confidence: 85,
-        severity: 'medium',
-        description: 'Bacterial or fungal infection causing dark spots with halos. Often caused by overhead watering.',
-        plant_name: 'Monstera Deliciosa',
-        seasonal_tips: 'Reduce watering frequency in winter as the plant enters dormancy.',
-        remedies: [
-          { step: 1, action: 'Isolate plant from others', timeframe: 'Immediately', effectiveness: 100 },
-          { step: 2, action: 'Prune affected areas', timeframe: 'Within 24h', effectiveness: 93 },
-          { step: 3, action: 'Water only at soil level', timeframe: 'Forever', effectiveness: 90 },
-        ],
-        prescribed_care: {
-          overview: 'Leaf spot is typically caused by fungal or bacterial pathogens that spread through water splash. Correcting watering habits is critical to recovery.',
-          immediate_actions: [
-            'Separate the plant from nearby plants immediately',
-            'Prune all leaves with dark spots and yellow halos',
-            'Remove leaves that are more than 30% affected',
-            'Sterilize pruning tools between cuts using rubbing alcohol'
-          ],
-          treatment_schedule: [
-            { week: 'Week 1', actions: 'Apply copper fungicide or bactericide spray. Spray every 7-10 days for 4 weeks.' },
-            { week: 'Week 2-4', actions: 'Monitor new leaf growth closely. Continue spraying and improve ventilation.' },
-            { week: 'Week 5+', actions: 'If no new spots appear for 3 weeks, reduce spray frequency to every 2 weeks.' }
-          ],
-          environmental_improvements: [
-            'Switch to bottom watering only (water from below the pot)',
-            'Never wet leaves during watering',
-            'Ensure humidity stays below 60%',
-            'Provide good air circulation with a small fan',
-            'Keep plant away from water-splashing areas'
-          ],
-          prevention: [
-            'Always water at the base of the plant, never overhead',
-            'Use room-temperature water (cold water increases infection risk)',
-            'Empty drainage saucers within 15 minutes of watering',
-            'Remove fallen leaves immediately',
-            'Wipe leaves with dry cloth to maintain dry foliage'
-          ]
-        }
-      }
-    ]
-    // Use image hash to deterministically select a disease
-    const hash = imageData ? hashImageData(imageData) : 0
-    return mockDiseases[hash % mockDiseases.length]
   }
 
   const performAnalysis = async (imageData) => {
@@ -236,7 +154,7 @@ function App() {
       // 60 second timeout for complete download
       timeoutId = setTimeout(() => controller.abort(), 60000)
       
-      const response = await fetch(`${API_BASE_URL}/report`, {
+      const response = await fetchWithApiFallback('/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reportData),
@@ -273,54 +191,23 @@ function App() {
 
   return (
     <div className="app-container">
-      <ThemeToggle isDark={isDark} toggle={toggleTheme} />
-      
-      {/* Language Selector */}
-      <div style={{
-        position: 'fixed',
-        top: '70px',
-        right: '20px',
-        zIndex: 1000,
-        display: 'flex',
-        gap: '8px',
-        backgroundColor: 'var(--color-bg)',
-        padding: '8px 12px',
-        borderRadius: '999px',
-        boxShadow: 'var(--shadow-soft)',
-        border: '1px solid var(--color-stone-light)'
-      }}>
-        <button
-          onClick={() => setLanguage('english')}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '999px',
-            border: 'none',
-            backgroundColor: language === 'english' ? 'var(--color-moss-deep)' : 'transparent',
-            color: language === 'english' ? 'white' : 'var(--color-moss-deep)',
-            cursor: 'pointer',
-            fontWeight: 600,
-            fontSize: '0.85rem',
-            transition: 'all 0.2s'
-          }}
-        >
-          🇬🇧 EN
-        </button>
-        <button
-          onClick={() => setLanguage('gujarati')}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '999px',
-            border: 'none',
-            backgroundColor: language === 'gujarati' ? 'var(--color-moss-deep)' : 'transparent',
-            color: language === 'gujarati' ? 'white' : 'var(--color-moss-deep)',
-            cursor: 'pointer',
-            fontWeight: 600,
-            fontSize: '0.85rem',
-            transition: 'all 0.2s'
-          }}
-        >
-          🇮🇳 ગુ
-        </button>
+      <div className="app-toolbar">
+        <div className="language-toggle" role="group" aria-label="Language selection">
+          <button
+            onClick={() => setLanguage('english')}
+            className={`language-toggle__btn ${language === 'english' ? 'is-active' : ''}`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setLanguage('gujarati')}
+            className={`language-toggle__btn ${language === 'gujarati' ? 'is-active' : ''}`}
+          >
+            ગુ
+          </button>
+        </div>
+
+        <ThemeToggle isDark={isDark} toggle={toggleTheme} />
       </div>
       
       <Hero language={language} />
@@ -371,27 +258,6 @@ function App() {
                 <button className="back-btn" onClick={() => setCurrentPage('home')}>
                   ← {t('backToHome', language)}
                 </button>
-                <VoiceAssistant 
-                  language={language} 
-                  onResult={(transcript) => {
-                    console.log('Voice input:', transcript)
-                    // Process voice commands
-                    const command = transcript.toLowerCase()
-                    if (command.includes('analyze') || command.includes('check') || command.includes('diagnose')) {
-                      // Navigate to analysis page
-                      setCurrentPage('analysis')
-                    } else if (command.includes('weather') || command.includes('environmental')) {
-                      setCurrentPage('environmental')
-                    } else if (command.includes('home') || command.includes('back')) {
-                      setCurrentPage('home')
-                    } else if (command.includes('basic') || command.includes('care')) {
-                      setCurrentPage('basic')
-                    } else if (command.includes('seasonal')) {
-                      setCurrentPage('seasonal')
-                    }
-                  }} 
-                  isAnalyzing={isAnalyzing}
-                />
               </div>
               <UploadZone language={language} onImageSelected={handleImageSelected} />
 
@@ -411,29 +277,16 @@ function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              style={{
-                textAlign: 'center',
-                padding: 'var(--space-2xl)',
-                minHeight: '400px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
+              className="analysis-loading"
             >
-              <div className="botanical-spinner" style={{ marginBottom: 'var(--space-md)' }}>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                  style={{ fontSize: '3rem' }}
-                >
-                  ✤
-                </motion.div>
-              </div>
-              <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-moss-deep)' }}>
-                Analyzing Specimen Structure...
-              </h3>
-              <p>Comparing against botanical archives.</p>
+              <motion.div
+                className="analysis-spinner"
+                aria-hidden="true"
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
+              />
+              <h3>{language === 'gujarati' ? 'નમૂનાનું વિશ્લેષણ ચાલી રહ્યું છે...' : 'Analyzing specimen structure...'}</h3>
+              <p>{language === 'gujarati' ? 'બોટાનિકલ ડેટા સાથે તુલના કરી રહ્યા છીએ.' : 'Comparing against botanical archives.'}</p>
             </motion.div>
           )}
 
@@ -458,14 +311,7 @@ function App() {
         </AnimatePresence>
       </main>
 
-      <footer style={{
-        textAlign: 'center',
-        padding: 'var(--space-xl)',
-        marginTop: 'auto',
-        color: 'var(--color-moss-light)',
-        fontSize: 'var(--text-small)',
-        borderTop: '1px solid rgba(44,62,46,0.1)'
-      }}>
+      <footer className="app-footer">
         <p>© {new Date().getFullYear()} Plant Health AI. Cultivated with care.</p>
       </footer>
     </div>

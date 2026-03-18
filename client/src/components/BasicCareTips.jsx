@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion' // eslint-disable-line no-unused-vars
 import { t } from '../translations'
 import { SunIcon, WaterIcon, EarthIcon, TemperatureIcon, NutritionIcon, BugIcon, CheckIcon } from './SeasonalIcons'
 
@@ -176,11 +176,13 @@ export default function BasicCareTips({ onBack, language = 'english' }) {
               </span>
               <h2>{section.category}</h2>
             </div>
-            <ul className="tips-card__list">
-              {section.tips.map((tip) => (
-                <li key={tip}>{tip}</li>
+            <div className="tips-card__rail" role="list" aria-label={`${section.category} tips`}>
+              {section.tips.map((tip, index) => (
+                <article className="tips-tip-card" role="listitem" key={`${section.category}-${index}`}>
+                  <p>{tip}</p>
+                </article>
               ))}
-            </ul>
+            </div>
           </motion.article>
         ))}
       </div>

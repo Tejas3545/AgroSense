@@ -1,3 +1,4 @@
+import base64
 """
 Plant Care Backend (Flask)
 
@@ -7,18 +8,15 @@ structured logging, health checks, and environment-based config.
 
 import os
 import re
-import base64
 import time
 import logging
 from logging.handlers import RotatingFileHandler
-import random
 from datetime import datetime
 from typing import List, Tuple, Optional
 from PIL import Image
 
 import requests
 from flask import Flask, jsonify, request, send_file
-import flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 from deep_translator import GoogleTranslator
@@ -429,7 +427,6 @@ def analyze_with_local_llm(image_bytes: bytes) -> Optional[dict]:
     LLM Studio provides OpenAI-compatible API on localhost:1234
     """
     try:
-        import base64
         import json
         
         logger.info(f"Analyzing with Local LLM Studio: {LOCAL_LLM_URL}")
@@ -544,7 +541,6 @@ def analyze_with_huggingface_api(image_bytes: bytes) -> Optional[dict]:
     Uses specialized plant disease detection model without downloading it.
     """
     try:
-        import base64
         
         if not HUGGINGFACE_API_KEY:
             logger.warning("Hugging Face API key not configured")
@@ -1300,7 +1296,6 @@ def handle_500(e):
 
 
 # ----------------------------------------------------------------------------
-from fpdf import FPDF
 import io
 
 def translate_text(text, target_lang='en'):
@@ -1464,10 +1459,8 @@ def generate_report():
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.units import inch
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
         from reportlab.lib import colors
-        from reportlab.pdfbase import pdfmetrics
-        from reportlab.pdfbase.ttfonts import TTFont
         
         # Create PDF with ReportLab (supports Unicode)
         pdf_output = io.BytesIO()
