@@ -4,7 +4,7 @@
 export const translations = {
   english: {
     name: "English",
-    flag: "🇬🇧",
+    flag: "",
     
     // Navigation & Hero
     home: "Home",
@@ -112,7 +112,7 @@ export const translations = {
   
   gujarati: {
     name: "ગુજરાતી",
-    flag: "🇮🇳",
+    flag: "",
     
     // Navigation & Hero
     home: "મુખ્ય પૃષ્ઠ",

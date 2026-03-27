@@ -1568,6 +1568,26 @@ def generate_report():
     plant_name = data.get('plant_name', 'Unknown Plant')
     seasonal_tips = data.get('seasonal_tips', '')
     prescribed_care = data.get('prescribed_care', {})
+
+    # Normalize remedies so downstream logic can safely assume dict-like items.
+    normalized_remedies = []
+    if isinstance(remedies, list):
+        for idx, remedy in enumerate(remedies, 1):
+            if isinstance(remedy, dict):
+                normalized_remedies.append({
+                    'step': remedy.get('step', idx),
+                    'action': str(remedy.get('action', '')),
+                    'timeframe': str(remedy.get('timeframe', '')),
+                    'effectiveness': remedy.get('effectiveness', 0)
+                })
+            elif isinstance(remedy, str):
+                normalized_remedies.append({
+                    'step': idx,
+                    'action': remedy,
+                    'timeframe': '',
+                    'effectiveness': 0
+                })
+    remedies = normalized_remedies
     
     logger.info(f"Extracted data - Disease: {disease}, Plant: {plant_name}, Remedies: {len(remedies)}")
     
@@ -1590,13 +1610,13 @@ def generate_report():
             if remedies:
                 translated_remedies = []
                 for r in remedies:
-                    action = str(r.get('action', ''))
-                    timeframe = str(r.get('timeframe', ''))
+                    action = str(r.get('action', '')) if isinstance(r, dict) else str(r)
+                    timeframe = str(r.get('timeframe', '')) if isinstance(r, dict) else ''
                     translated_remedies.append({
-                        'step': r.get('step', ''),
+                        'step': r.get('step', '') if isinstance(r, dict) else '',
                         'action': translate_text(action, lang_code) if len(action) > 5 else action,
                         'timeframe': translate_text(timeframe, lang_code) if len(timeframe) > 3 else timeframe,
-                        'effectiveness': r.get('effectiveness', 0)
+                        'effectiveness': r.get('effectiveness', 0) if isinstance(r, dict) else 0
                     })
                 remedies = translated_remedies
             
@@ -1675,9 +1695,14 @@ def generate_report():
         if remedies:
             story.append(Paragraph("Evidence-Based Treatment Protocol", heading_style))
             for i, remedy in enumerate(remedies, 1):
-                action = remedy.get('action', '')
-                timeframe = remedy.get('timeframe', '')
-                effectiveness = remedy.get('effectiveness', 0)
+                if isinstance(remedy, dict):
+                    action = remedy.get('action', '')
+                    timeframe = remedy.get('timeframe', '')
+                    effectiveness = remedy.get('effectiveness', 0)
+                else:
+                    action = str(remedy)
+                    timeframe = ''
+                    effectiveness = 0
                 remedy_text = f"<b>Step {i}:</b> {action}<br/><i>Timeline: {timeframe} | Effectiveness: {effectiveness}%</i>"
                 story.append(Paragraph(remedy_text, styles['Normal']))
                 story.append(Spacer(1, 0.1*inch))

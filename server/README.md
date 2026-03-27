@@ -1,73 +1,59 @@
-# Plant Care AI - Server (Backend)
+# AgroSense Server
 
-Flask API for plant disease analysis using Gemini, Hugging Face, or mock providers.
+Flask backend API for plant disease analysis.
 
 ## Quick Start
 
 ```bash
 cd server
-python -m venv venv
-venv\Scripts\activate       # Windows
-source venv/bin/activate    # Mac/Linux
+python -m venv .venv
+.venv\Scripts\activate       # Windows
+source .venv/bin/activate    # Mac/Linux
 
 pip install -U pip
 pip install -r requirements.txt
-
 python app.py
 ```
 
-The API listens on `http://localhost:8000`.
+The API runs on `http://localhost:8000` by default.
 
-## Configuration
+## Environment
 
-Edit `.env`:
+Create `server/.env` for local configuration:
 
-```dotenv
-# Hugging Face Inference API
-HUGGINGFACE_API_KEY=your_hf_token
-HUGGINGFACE_MODEL=juppy44/plant-identification-2m-vit-b
-
-# Google Gemini
+```env
+# AI providers
 GEMINI_API_KEY=your_gemini_key
 GEMINI_MODEL=gemini-2.5-flash
+HUGGINGFACE_API_KEY=your_hf_token
 
-# Provider order (tries in sequence)
+# Provider fallback order
 PROVIDER_ORDER=gemini,hf,mock
 
-# Flask
+# Server
+HOST=0.0.0.0
+PORT=8000
 FLASK_DEBUG=true
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000,https://agrosense-health.vercel.app
+
+# Frontend origins
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 ```
 
-## Endpoints
+## Main Endpoints
 
-- **POST /api/analyze** – Analyze a plant image
-  ```json
-  {
-    "image": "data:image/jpeg;base64,..."
-  }
-  ```
-  Returns disease info, confidence, severity, and treatment steps.
-
-- **GET /api/health** – Server status
-- **GET /api/diseases** – List all disease types
+- `GET /api/health` - Health check
+- `POST /api/analyze` - Analyze uploaded image
+- `GET /api/diseases` - List disease entries used by the app
 
 ## Logs
 
-Rotating logs in `logs/app.log` with request/response timing and error details.
+Runtime logs are written to `server/logs/app.log`.
 
-## Production
+## Production Notes
 
-```bash
-pip install -r requirements.txt
-waitress-serve --host=0.0.0.0 --port=8000 app:app
-```
-
-## Render
-
-For Render, deploy from the `server` directory using the included [render.yaml](c:\Users\solan\OneDrive\Desktop\AgroSense\server\render.yaml).
-
-The default `requirements.txt` intentionally excludes heavyweight local-model packages such as PyTorch and Transformers so the service can boot reliably on small cloud instances. If you want offline local-model support for development, also install:
+- Deploy config: `server/render.yaml`
+- `requirements.txt` keeps cloud deploy lightweight
+- Optional local-model dependencies:
 
 ```bash
 pip install -r requirements-optional-local-models.txt

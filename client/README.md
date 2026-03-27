@@ -1,6 +1,6 @@
-# Plant Care AI – Client (Frontend)
+# AgroSense Client
 
-React + Vite frontend for plant disease detection and diagnosis.
+React + Vite frontend for crop image upload, disease analysis, and treatment guidance.
 
 ## Quick Start
 
@@ -10,22 +10,27 @@ npm install
 npm run dev
 ```
 
-The app will run on `http://localhost:5173` and communicate with the backend at `http://localhost:5000/api`.
+The app runs on `http://localhost:5173`.
 
-## Environment
+## API Configuration
 
-No additional setup required; the backend URL is hardcoded in [src/App.jsx](src/App.jsx).
+- Default local API: `http://localhost:8000/api`
+- Default production API: `https://agrosense-backend-otb9.onrender.com/api`
+- Override with: `VITE_API_URL`
 
-## Build
+Example (`client/.env.local`):
 
-```bash
-npm run build
+```env
+VITE_API_URL=http://localhost:8000/api
 ```
 
-Output is in `dist/`.
+Config source: `src/config/api.js`.
 
-## Linting
+## Scripts
 
 ```bash
-npm run lint
+npm run dev      # Start development server
+npm run build    # Build for production (output: dist/)
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
 ```
