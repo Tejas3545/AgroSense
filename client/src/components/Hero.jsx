@@ -49,7 +49,7 @@ export default function Hero({ language = 'english', isDark = false, onNavigate 
                 onClick={() => onNavigate(f.id)}
               >
                 <span className="hero-feature__icon">
-                  <f.Icon size={20} color="currentColor" />
+                  <f.Icon size={24} color="currentColor" />
                 </span>
                 <div>
                   <h4>{t(f.titleKey, language)}</h4>
@@ -61,46 +61,25 @@ export default function Hero({ language = 'english', isDark = false, onNavigate 
         </div>
 
         <aside className="hero-landing__visual" aria-label="Plant health workflow">
-          <div className="hero-panel hero-panel--model">
-            <div className="hero-model-wrap">
-              {showFreepikAsset ? (
-                <img
-                  src={freepikAssetUrl}
-                  alt={language === 'gujarati' ? 'છોડ આધારિત ઇલસ્ટ્રેશન' : 'Plant-based illustration'}
-                  className="hero-asset-image"
-                />
-              ) : (
-                <model-viewer
-                  src="https://threejs.org/examples/models/gltf/Flower/Flower.glb"
-                  camera-controls
-                  disable-zoom
-                  auto-rotate
-                  autoplay
-                  shadow-intensity="1"
-                  exposure="0.95"
-                  ar={false}
-                  className="hero-model-viewer"
-                />
-              )}
-            </div>
-            <div className="hero-model-meta">
-              <strong>
-                {showFreepikAsset
-                  ? (language === 'gujarati' ? 'Freepik ઇલસ્ટ્રેશન' : 'Freepik Illustration')
-                  : (language === 'gujarati' ? 'રિયલ 3D મોડેલ' : 'Real 3D Model')}
-              </strong>
-              <p>
-                {showFreepikAsset
-                  ? (
-                    <>
-                      {language === 'gujarati' ? 'એટ્રિબ્યુશન:' : 'Attribution:'}{' '}
-                      <a href={freepikCreditUrl} target="_blank" rel="noreferrer">Freepik</a>
-                    </>
-                  )
-                  : (language === 'gujarati' ? 'લાઇવ વેબ મોડેલ સાથે થીમ-મેચ્ડ વિઝ્યુઅલ' : 'Web-fetched 3D asset integrated with your theme')}
-              </p>
-            </div>
-          </div>
+          {showFreepikAsset ? (
+            <img
+              src={freepikAssetUrl}
+              alt={language === 'gujarati' ? 'છોડ આધારિત ઇલસ્ટ્રેશન' : 'Plant-based illustration'}
+              className="hero-asset-image"
+            />
+          ) : (
+            <model-viewer
+              src="https://threejs.org/examples/models/gltf/Flower/Flower.glb"
+              camera-controls
+              disable-zoom
+              auto-rotate
+              autoplay
+              shadow-intensity="1"
+              exposure="0.95"
+              ar={false}
+              className="hero-model-viewer"
+            />
+          )}
         </aside>
       </div>
     </section>

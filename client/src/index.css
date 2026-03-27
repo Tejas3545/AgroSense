@@ -170,7 +170,7 @@ button {
   position: relative;
   z-index: 5;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  grid-template-columns: minmax(0, 1fr) minmax(400px, 550px);
   align-items: center;
   gap: var(--space-10);
   max-width: 1280px;
@@ -185,7 +185,7 @@ button {
 }
 
 .hero-landing__content h1 {
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
   font-weight: 700;
   color: var(--ui-accent);
   line-height: 1.1;
@@ -194,11 +194,11 @@ button {
 }
 
 .hero-landing__content p {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   color: var(--ui-text-muted);
   line-height: 1.6;
   margin-bottom: var(--space-6);
-  max-width: 560px;
+  max-width: 580px;
 }
 
 .hero-actions {
@@ -210,9 +210,9 @@ button {
 .hero-action {
   border: var(--border-width-base) solid var(--ui-border);
   border-radius: var(--radius-md);
-  height: 42px;
-  padding: 0 var(--space-4);
-  font-size: var(--text-sm);
+  height: 48px;
+  padding: 0 var(--space-5);
+  font-size: var(--text-base);
   font-weight: 600;
   color: var(--ui-text);
   background: var(--ui-surface);
@@ -269,8 +269,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-md);
   background: var(--ui-surface-muted);
   color: var(--ui-accent);
@@ -280,13 +280,13 @@ button {
 
 .hero-feature h4 {
   color: var(--ui-text);
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   margin-bottom: var(--space-1);
 }
 
 .hero-feature p {
   color: var(--ui-text-muted);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   line-height: 1.4;
 }
 
@@ -340,17 +340,18 @@ button {
 
 .hero-model-viewer {
   width: 100%;
-  height: 300px;
+  height: 450px;
   background: transparent;
   --poster-color: transparent;
 }
 
 .hero-asset-image {
   width: 100%;
-  height: 300px;
+  height: 450px;
   object-fit: contain;
   display: block;
-  padding: 12px;
+  padding: 0;
+  transform: scale(1.15);
 }
 
 .hero-model-meta {
