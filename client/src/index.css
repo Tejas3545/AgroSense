@@ -759,7 +759,7 @@ button {
 .env-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .panel-card {
@@ -860,7 +860,89 @@ button {
 }
 
 .recommendation-panel {
-  margin-top: var(--space-5);
+  margin-top: var(--space-4);
+}
+
+.env-table-card {
+  padding: var(--space-4);
+}
+
+.env-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+.env-table th,
+.env-table td {
+  border-bottom: 1px solid var(--ui-border);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.env-table tr:last-child th,
+.env-table tr:last-child td {
+  border-bottom: none;
+}
+
+.env-table th {
+  width: 40%;
+  color: var(--ui-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  background: var(--ui-surface-muted);
+}
+
+.env-table td {
+  color: var(--ui-text);
+  font-size: var(--text-sm);
+}
+
+.recommend-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.recommend-table th,
+.recommend-table td {
+  border-bottom: 1px solid var(--ui-border);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.recommend-table tr:last-child td {
+  border-bottom: none;
+}
+
+.recommend-table thead th {
+  background: var(--ui-surface-muted);
+  color: var(--ui-text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.recommend-table tbody td:first-child {
+  width: 32%;
+  color: var(--ui-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.recommend-table tbody td:last-child {
+  color: var(--ui-text);
+  font-size: var(--text-sm);
 }
 
 .recommend-grid {
@@ -953,6 +1035,14 @@ button {
   .soil-strip-grid,
   .recommend-grid {
     grid-template-columns: 1fr;
+  }
+
+  .env-table th,
+  .env-table td,
+  .recommend-table th,
+  .recommend-table td {
+    padding: 8px 10px;
+    font-size: var(--text-xs);
   }
 }
 

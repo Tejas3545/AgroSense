@@ -215,58 +215,48 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
       </div>
 
       <div className="env-grid">
-        <section className="panel-card">
+        <section className="panel-card env-table-card">
           <div className="panel-head">
             <h2><CloudIcon size={18} /> {t('currentWeather', language)}</h2>
             <span>{weatherData?.location || location}</span>
           </div>
-          <div className="hero-metric">
-            <strong>{weatherData?.temperature ?? '--'}°</strong>
-            <p>{weatherData?.description || '--'}</p>
-          </div>
-          <div className="stat-grid">
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{t('temperature', language)}</span><strong>{weatherData?.temperature ?? '--'}°C</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'અનુભવાય તેવું' : 'Feels Like'}</span><strong>{weatherData?.feels_like ?? '--'}°C</strong></div>
-            <div className="stat-card"><WaterIcon size={18} /><span>{t('humidity', language)}</span><strong>{weatherData?.humidity ?? '--'}%</strong></div>
-            <div className="stat-card"><WindIcon size={18} /><span>{t('windSpeed', language)}</span><strong>{weatherData?.windSpeed ?? '--'} km/h</strong></div>
-            <div className="stat-card"><WaterIcon size={18} /><span>{language === 'gujarati' ? 'વરસાદ' : 'Rainfall'}</span><strong>{weatherData?.rainfall ?? '--'} mm</strong></div>
-            <div className="stat-card"><CloudIcon size={18} /><span>{language === 'gujarati' ? 'વાદળ આવરણ' : 'Cloud Cover'}</span><strong>{weatherData?.cloudiness ?? '--'}%</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'દબાણ' : 'Pressure'}</span><strong>{weatherData?.pressure ?? '--'} hPa</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'સૂર્યોદય' : 'Sunrise'}</span><strong>{weatherData?.sunrise ?? '--'}</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'સૂર્યાસ્ત' : 'Sunset'}</span><strong>{weatherData?.sunset ?? '--'}</strong></div>
-          </div>
-          <div className="env-meta-row">
-            <span>{language === 'gujarati' ? 'સ્ત્રોત' : 'Source'}: {weatherData?.source ?? '--'}</span>
-            <span>{language === 'gujarati' ? 'અપડેટ' : 'Updated'}: {weatherData?.timestamp ? new Date(weatherData.timestamp).toLocaleString() : '--'}</span>
-          </div>
+          <table className="env-table" aria-label="Weather data table">
+            <tbody>
+              <tr><th>{language === 'gujarati' ? 'વર્ણન' : 'Condition'}</th><td>{weatherData?.description || '--'}</td></tr>
+              <tr><th>{t('temperature', language)}</th><td>{weatherData?.temperature ?? '--'}°C</td></tr>
+              <tr><th>{language === 'gujarati' ? 'અનુભવાય તેવું' : 'Feels Like'}</th><td>{weatherData?.feels_like ?? '--'}°C</td></tr>
+              <tr><th>{t('humidity', language)}</th><td>{weatherData?.humidity ?? '--'}%</td></tr>
+              <tr><th>{t('windSpeed', language)}</th><td>{weatherData?.windSpeed ?? '--'} km/h</td></tr>
+              <tr><th>{language === 'gujarati' ? 'વરસાદ' : 'Rainfall'}</th><td>{weatherData?.rainfall ?? '--'} mm</td></tr>
+              <tr><th>{language === 'gujarati' ? 'વાદળ આવરણ' : 'Cloud Cover'}</th><td>{weatherData?.cloudiness ?? '--'}%</td></tr>
+              <tr><th>{language === 'gujarati' ? 'દબાણ' : 'Pressure'}</th><td>{weatherData?.pressure ?? '--'} hPa</td></tr>
+              <tr><th>{language === 'gujarati' ? 'સૂર્યોદય' : 'Sunrise'}</th><td>{weatherData?.sunrise ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'સૂર્યાસ્ત' : 'Sunset'}</th><td>{weatherData?.sunset ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'સ્ત્રોત' : 'Source'}</th><td>{weatherData?.source ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'અપડેટ' : 'Updated'}</th><td>{weatherData?.timestamp ? new Date(weatherData.timestamp).toLocaleString() : '--'}</td></tr>
+            </tbody>
+          </table>
         </section>
 
-        <section className="panel-card">
+        <section className="panel-card env-table-card">
           <div className="panel-head">
             <h2><WaterIcon size={18} /> {t('soilData', language)}</h2>
           </div>
-          <div className="stat-grid">
-            <div className="stat-card"><WaterIcon size={18} /><span>{t('soilMoisture', language)}</span><strong>{soilData?.moisture ?? '--'}</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{t('soilTemperature', language)}</span><strong>{soilData?.temperature ?? weatherData?.feels_like ?? weatherData?.temperature ?? '--'}°C</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'જૈવિક પદાર્થ' : 'Organic Matter'}</span><strong>{soilData?.organicMatter ?? '--'}</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'માટી રચના' : 'Texture'}</span><strong>{soilData?.texture ?? '--'}</strong></div>
-          </div>
-          <div className="soil-strip">
-            <div className="soil-strip-top">
-              <span>{t('phLevel', language)}</span>
-              <strong>{soilData?.ph ?? '--'}</strong>
-            </div>
-            <div className="soil-strip-grid">
-              <div><span>{t('nitrogen', language)}</span><strong>{soilData?.nitrogen ?? '--'}</strong></div>
-              <div><span>{t('phosphorus', language)}</span><strong>{soilData?.phosphorus ?? '--'}</strong></div>
-              <div><span>{t('potassium', language)}</span><strong>{soilData?.potassium ?? '--'}</strong></div>
-            </div>
-          </div>
-          <div className="env-meta-row">
-            <span>{language === 'gujarati' ? 'સ્ત્રોત' : 'Source'}: {soilData?.source ?? '--'}</span>
-            <span>{language === 'gujarati' ? 'અપડેટ' : 'Updated'}: {soilData?.timestamp ? new Date(soilData.timestamp).toLocaleString() : '--'}</span>
-          </div>
-          {soilData?.note && <p className="env-note">{soilData.note}</p>}
+          <table className="env-table" aria-label="Soil data table">
+            <tbody>
+              <tr><th>{t('soilMoisture', language)}</th><td>{soilData?.moisture ?? '--'}</td></tr>
+              <tr><th>{t('soilTemperature', language)}</th><td>{soilData?.temperature ?? weatherData?.feels_like ?? weatherData?.temperature ?? '--'}°C</td></tr>
+              <tr><th>{t('phLevel', language)}</th><td>{soilData?.ph ?? '--'}</td></tr>
+              <tr><th>{t('nitrogen', language)}</th><td>{soilData?.nitrogen ?? '--'}</td></tr>
+              <tr><th>{t('phosphorus', language)}</th><td>{soilData?.phosphorus ?? '--'}</td></tr>
+              <tr><th>{t('potassium', language)}</th><td>{soilData?.potassium ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'જૈવિક પદાર્થ' : 'Organic Matter'}</th><td>{soilData?.organicMatter ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'માટી રચના' : 'Texture'}</th><td>{soilData?.texture ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'સ્ત્રોત' : 'Source'}</th><td>{soilData?.source ?? '--'}</td></tr>
+              <tr><th>{language === 'gujarati' ? 'અપડેટ' : 'Updated'}</th><td>{soilData?.timestamp ? new Date(soilData.timestamp).toLocaleString() : '--'}</td></tr>
+              {soilData?.note && <tr><th>{language === 'gujarati' ? 'ટિપ્પણી' : 'Note'}</th><td>{soilData.note}</td></tr>}
+            </tbody>
+          </table>
         </section>
       </div>
 
@@ -274,19 +264,22 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
         <div className="panel-head">
           <h2>{t('recommendations', language)}</h2>
         </div>
-        <div className="recommend-sections">
-          {recommendationSections.map((section) => (
-            <div key={section.title} className="recommend-section">
-              <h3>{section.title}</h3>
-              {section.items.map((rec, idx) => (
-                <div key={idx} className="recommend-card">
-                  <span>✓</span>
-                  <p>{rec}</p>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        <table className="recommend-table" aria-label="Agriculture recommendation table">
+          <thead>
+            <tr>
+              <th>{language === 'gujarati' ? 'વિભાગ' : 'Category'}</th>
+              <th>{language === 'gujarati' ? 'ભલામણ' : 'Recommendation'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recommendationSections.flatMap((section) => section.items.map((item, idx) => (
+              <tr key={`${section.title}-${idx}`}>
+                <td>{section.title}</td>
+                <td>{item}</td>
+              </tr>
+            )))}
+          </tbody>
+        </table>
       </section>
     </div>
   )
