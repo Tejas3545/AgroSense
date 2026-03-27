@@ -17,7 +17,15 @@ export default function DetailedCareGuide({ prescribedCare, language = 'english'
 
   const normalizeSchedule = (value) => {
     if (!Array.isArray(value)) return []
-    return value.filter((item) => item && (item.week || item.actions))
+    return value
+      .filter((item) => item && (item.week || item.day || item.actions || item.action))
+      .map((item) => ({
+        week: item.week,
+        day: item.day,
+        actions: item.actions,
+        action: item.action,
+        notes: item.notes
+      }))
   }
 
   const sections = useMemo(
@@ -31,7 +39,7 @@ export default function DetailedCareGuide({ prescribedCare, language = 'english'
           content:
             typeof prescribedCare.overview === 'string' && prescribedCare.overview.trim()
               ? prescribedCare.overview
-              : 'No overview available yet.'
+              : ''
         },
         {
           id: 'immediate',

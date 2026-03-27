@@ -4,6 +4,89 @@ import { API_BASE_URL } from '../config/api'
 import { WarningIcon } from './Icons'
 import { CloudIcon, WindIcon, TemperatureIcon, WaterIcon } from './SeasonalIcons'
 
+const getRiskLevel = (score) => {
+  if (score >= 80) return 'High'
+  if (score >= 50) return 'Moderate'
+  return 'Low'
+}
+
+const buildAgricultureRecommendations = (weatherData, soilData, language) => {
+  const temp = Number(weatherData?.temperature ?? 0)
+  const humidity = Number(weatherData?.humidity ?? 0)
+  const rainfall = Number(weatherData?.rainfall ?? 0)
+  const wind = Number(weatherData?.windSpeed ?? 0)
+  const cloudiness = Number(weatherData?.cloudiness ?? 0)
+  const ph = Number(soilData?.ph ?? 0)
+  const moistureRaw = soilData?.moisture ?? ''
+  const moisture = Number(String(moistureRaw).replace('%', '').trim() || 0)
+
+  const fungalRiskScore = Math.min(100, Math.round((humidity * 0.55) + (rainfall * 6) + (cloudiness * 0.2)))
+  const droughtRiskScore = Math.min(100, Math.round((Math.max(0, temp - 27) * 4) + (Math.max(0, 45 - humidity) * 1.5) + (Math.max(0, 30 - moisture))))
+
+  const irrigation = language === 'gujarati'
+    ? [
+        `આજનું તાપમાન ${temp || '--'}°C અને ભેજ ${humidity || '--'}% છે, તેથી વહેલી સવારે ઊંડું પાણી આપવું યોગ્ય રહેશે.`,
+        rainfall > 2
+          ? `છેલ્લા કલાકમાં વરસાદ (${rainfall} mm) હોવાથી આગામી સિંચાઈ ચક્ર 12-24 કલાક મુલતવી રાખો.`
+          : `વરસાદ ઓછો હોવાથી, માટીની ભેજ ${moisture || '--'}% આધારે 24 કલાકમાં ફરી હળવી સિંચાઈ કરો.`,
+        moisture < 35
+          ? 'માટીમાં ભેજ ઓછી હોવાથી ઓર્ગેનિક મલ્ચ 4-6 સેમી સુધી ઉમેરો.'
+          : 'ભેજ યોગ્ય છે; પાણી ભરાવ ટાળવા માત્ર જરૂર પ્રમાણે પાણી આપો.'
+      ]
+    : [
+        `Current temperature is ${temp || '--'}°C with ${humidity || '--'}% humidity, so irrigate deeply in early morning for better uptake.`,
+        rainfall > 2
+          ? `Rainfall in the last hour (${rainfall} mm) suggests delaying the next irrigation cycle by 12-24 hours.`
+          : `With low rainfall, schedule a light follow-up irrigation within 24 hours based on soil moisture (${moisture || '--'}%).`,
+        moisture < 35
+          ? 'Soil moisture is low; add 4-6 cm organic mulch to reduce evapotranspiration losses.'
+          : 'Moisture is acceptable; avoid over-irrigation and maintain drainage to prevent root stress.'
+      ]
+
+  const nutrition = language === 'gujarati'
+    ? [
+        `માટી pH ${ph || '--'} છે. આ મૂલ્ય ${ph < 6 ? 'ઓછું' : ph > 7.4 ? 'ઉંચું' : 'સમતુલિત'} છે, તેથી ખાતર વ્યવસ્થા તે મુજબ ગોઠવો.`,
+        `નાઇટ્રોજન: ${soilData?.nitrogen ?? '--'}, ફોસ્ફરસ: ${soilData?.phosphorus ?? '--'}, પોટેશિયમ: ${soilData?.potassium ?? '--'} પર આધારિત તબક્કાવાર NPK આપો.`,
+        `ઓર્ગેનિક મેટર ${soilData?.organicMatter ?? '--'} હોવાથી દર 15 દિવસે કમ્પોસ્ટ અથવા જીવામૃત ઉમેરો.`
+      ]
+    : [
+        `Soil pH is ${ph || '--'}; this is ${ph < 6 ? 'acidic' : ph > 7.4 ? 'alkaline' : 'near-optimal'}, so adjust nutrient strategy accordingly.`,
+        `Use staged NPK feeding based on Nitrogen (${soilData?.nitrogen ?? '--'}), Phosphorus (${soilData?.phosphorus ?? '--'}), and Potassium (${soilData?.potassium ?? '--'}).`,
+        `Organic matter at ${soilData?.organicMatter ?? '--'} indicates adding compost or bio-organic inputs every 15 days for soil health.`
+      ]
+
+  const protection = language === 'gujarati'
+    ? [
+        `ફંગલ જોખમ: ${getRiskLevel(fungalRiskScore)} (${fungalRiskScore}%). પાંદડા સૂકા રાખો અને વાયુ પ્રવાહ વધારો.`,
+        `સૂકાપણાનો જોખમ: ${getRiskLevel(droughtRiskScore)} (${droughtRiskScore}%). ગરમીમાં શેડનેટ અને મલ્ચનો ઉપયોગ કરો.`,
+        wind > 20
+          ? `પવનની ઝડપ ${wind} km/h છે, તેથી નાજુક છોડને ટેકો અથવા પવનરોધક આપો.`
+          : `પવન સામાન્ય છે; માત્ર કેનોપી હવાની અવરજવર જાળવો.`
+      ]
+    : [
+        `Fungal pressure risk: ${getRiskLevel(fungalRiskScore)} (${fungalRiskScore}%). Keep foliage dry and improve air circulation.`,
+        `Drought stress risk: ${getRiskLevel(droughtRiskScore)} (${droughtRiskScore}%). Use mulch and temporary shade support during peak heat.`,
+        wind > 20
+          ? `Wind speed is ${wind} km/h; use staking or windbreak support for tender crops.`
+          : `Wind load is manageable; continue canopy ventilation practices.`
+      ]
+
+  return [
+    {
+      title: language === 'gujarati' ? 'સિંચાઈ અને ભેજ વ્યવસ્થાપન' : 'Irrigation & Moisture Management',
+      items: irrigation
+    },
+    {
+      title: language === 'gujarati' ? 'માટી પોષણ અને pH સંભાળ' : 'Soil Nutrition & pH Care',
+      items: nutrition
+    },
+    {
+      title: language === 'gujarati' ? 'રોગ-જીવાત અને તાણ નિવારણ' : 'Disease, Pest & Stress Prevention',
+      items: protection
+    }
+  ]
+}
+
 const WeatherSoilData = ({ onBack, language = 'english' }) => {
   const [weatherData, setWeatherData] = useState(null)
   const [soilData, setSoilData] = useState(null)
@@ -33,78 +116,53 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
   }, [fetchEnvironmentalData])
 
   const fetchWeatherData = async () => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/environment/weather?location=${encodeURIComponent(location)}`
-      )
-      
-      if (response.ok) {
-        const data = await response.json()
-        setWeatherData({
-          temperature: data.temperature,
-          feels_like: data.feels_like,
-          humidity: data.humidity,
-          description: data.description,
-          windSpeed: data.wind_speed,
-          rainfall: data.rainfall,
-          cloudiness: data.cloudiness,
-          pressure: data.pressure,
-          sunrise: data.sunrise,
-          sunset: data.sunset
-        })
-      } else {
-        throw new Error('Weather API request failed')
-      }
-    } catch (error) {
-      console.error('Weather API error:', error)
-      // Fallback mock data
-      setWeatherData({
-        temperature: 28,
-        humidity: 65,
-        description: 'Partly cloudy',
-        windSpeed: 12,
-        rainfall: 0,
-        feels_like: 30,
-        cloudiness: 40,
-        pressure: 1013
-      })
+    const response = await fetch(
+      `${API_BASE_URL}/environment/weather?location=${encodeURIComponent(location)}`
+    )
+
+    if (!response.ok) {
+      throw new Error('Weather API request failed')
     }
+
+    const data = await response.json()
+    setWeatherData({
+      location: data.location,
+      temperature: data.temperature,
+      feels_like: data.feels_like,
+      humidity: data.humidity,
+      description: data.description,
+      windSpeed: data.wind_speed,
+      rainfall: data.rainfall,
+      cloudiness: data.cloudiness,
+      pressure: data.pressure,
+      sunrise: data.sunrise,
+      sunset: data.sunset,
+      source: data.source,
+      timestamp: data.timestamp
+    })
   }
 
   const fetchSoilData = async () => {
-    try {
-      // You can add lat/lon parameters if user provides location
-      const response = await fetch(`${API_BASE_URL}/environment/soil`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        setSoilData({
-          ph: data.ph,
-          nitrogen: data.nitrogen,
-          phosphorus: data.phosphorus,
-          potassium: data.potassium,
-          organicMatter: data.organic_matter,
-          texture: data.texture,
-          moisture: data.moisture,
-          source: data.source
-        })
-      } else {
-        throw new Error('Soil API request failed')
-      }
-    } catch (error) {
-      console.error('Soil API error:', error)
-      // Fallback mock data
-      setSoilData({
-        ph: 6.8,
-        nitrogen: 'Medium',
-        phosphorus: 'High',
-        potassium: 'Medium',
-        organicMatter: '2.1%',
-        texture: 'Clay Loam',
-        moisture: '45%',
-        source: 'Fallback Data'
-      })
+    const response = await fetch(`${API_BASE_URL}/environment/soil`)
+
+    if (!response.ok) {
+      throw new Error('Soil API request failed')
     }
+
+    const data = await response.json()
+    setSoilData({
+      ph: data.ph,
+      nitrogen: data.nitrogen,
+      phosphorus: data.phosphorus,
+      potassium: data.potassium,
+      organicMatter: data.organic_matter,
+      texture: data.texture,
+      moisture: data.moisture,
+      temperature: data.temperature,
+      source: data.source,
+      timestamp: data.timestamp,
+      note: data.note
+    })
   }
 
   if (loading) {
@@ -140,17 +198,7 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
     )
   }
 
-  const recommendations = language === 'gujarati'
-    ? [
-        `ઊંચા તાપમાન દરમિયાન સવારે અથવા સાંજે પાણી આપો (${weatherData?.temperature ?? '--'}°C)`,
-        `ભેજ જાળવવા માટે મૂળની આસપાસ મલ્ચિંગ કરો (${weatherData?.humidity ?? '--'}%)`,
-        `pH ${soilData?.ph ?? '--'} ને 6.0-7.0 વચ્ચે જાળવવા માટે માટી ચકાસો`
-      ]
-    : [
-        `Water in early morning or evening during high temperatures (${weatherData?.temperature ?? '--'}°C)`,
-        `Apply mulch around roots to conserve moisture (${weatherData?.humidity ?? '--'}%)`,
-        `Test soil to maintain pH between 6.0-7.0 (current ${soilData?.ph ?? '--'})`
-      ]
+  const recommendationSections = buildAgricultureRecommendations(weatherData, soilData, language)
 
   return (
     <div className="page-shell">
@@ -170,7 +218,7 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
         <section className="panel-card">
           <div className="panel-head">
             <h2><CloudIcon size={18} /> {t('currentWeather', language)}</h2>
-            <span>{location}</span>
+            <span>{weatherData?.location || location}</span>
           </div>
           <div className="hero-metric">
             <strong>{weatherData?.temperature ?? '--'}°</strong>
@@ -178,8 +226,18 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
           </div>
           <div className="stat-grid">
             <div className="stat-card"><TemperatureIcon size={18} /><span>{t('temperature', language)}</span><strong>{weatherData?.temperature ?? '--'}°C</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'અનુભવાય તેવું' : 'Feels Like'}</span><strong>{weatherData?.feels_like ?? '--'}°C</strong></div>
             <div className="stat-card"><WaterIcon size={18} /><span>{t('humidity', language)}</span><strong>{weatherData?.humidity ?? '--'}%</strong></div>
             <div className="stat-card"><WindIcon size={18} /><span>{t('windSpeed', language)}</span><strong>{weatherData?.windSpeed ?? '--'} km/h</strong></div>
+            <div className="stat-card"><WaterIcon size={18} /><span>{language === 'gujarati' ? 'વરસાદ' : 'Rainfall'}</span><strong>{weatherData?.rainfall ?? '--'} mm</strong></div>
+            <div className="stat-card"><CloudIcon size={18} /><span>{language === 'gujarati' ? 'વાદળ આવરણ' : 'Cloud Cover'}</span><strong>{weatherData?.cloudiness ?? '--'}%</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'દબાણ' : 'Pressure'}</span><strong>{weatherData?.pressure ?? '--'} hPa</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'સૂર્યોદય' : 'Sunrise'}</span><strong>{weatherData?.sunrise ?? '--'}</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'સૂર્યાસ્ત' : 'Sunset'}</span><strong>{weatherData?.sunset ?? '--'}</strong></div>
+          </div>
+          <div className="env-meta-row">
+            <span>{language === 'gujarati' ? 'સ્ત્રોત' : 'Source'}: {weatherData?.source ?? '--'}</span>
+            <span>{language === 'gujarati' ? 'અપડેટ' : 'Updated'}: {weatherData?.timestamp ? new Date(weatherData.timestamp).toLocaleString() : '--'}</span>
           </div>
         </section>
 
@@ -189,7 +247,9 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
           </div>
           <div className="stat-grid">
             <div className="stat-card"><WaterIcon size={18} /><span>{t('soilMoisture', language)}</span><strong>{soilData?.moisture ?? '--'}</strong></div>
-            <div className="stat-card"><TemperatureIcon size={18} /><span>{t('soilTemperature', language)}</span><strong>{weatherData?.feels_like ?? weatherData?.temperature ?? '--'}°C</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{t('soilTemperature', language)}</span><strong>{soilData?.temperature ?? weatherData?.feels_like ?? weatherData?.temperature ?? '--'}°C</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'જૈવિક પદાર્થ' : 'Organic Matter'}</span><strong>{soilData?.organicMatter ?? '--'}</strong></div>
+            <div className="stat-card"><TemperatureIcon size={18} /><span>{language === 'gujarati' ? 'માટી રચના' : 'Texture'}</span><strong>{soilData?.texture ?? '--'}</strong></div>
           </div>
           <div className="soil-strip">
             <div className="soil-strip-top">
@@ -202,6 +262,11 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
               <div><span>{t('potassium', language)}</span><strong>{soilData?.potassium ?? '--'}</strong></div>
             </div>
           </div>
+          <div className="env-meta-row">
+            <span>{language === 'gujarati' ? 'સ્ત્રોત' : 'Source'}: {soilData?.source ?? '--'}</span>
+            <span>{language === 'gujarati' ? 'અપડેટ' : 'Updated'}: {soilData?.timestamp ? new Date(soilData.timestamp).toLocaleString() : '--'}</span>
+          </div>
+          {soilData?.note && <p className="env-note">{soilData.note}</p>}
         </section>
       </div>
 
@@ -209,11 +274,16 @@ const WeatherSoilData = ({ onBack, language = 'english' }) => {
         <div className="panel-head">
           <h2>{t('recommendations', language)}</h2>
         </div>
-        <div className="recommend-grid">
-          {recommendations.map((rec, idx) => (
-            <div key={idx} className="recommend-card">
-              <span>✓</span>
-              <p>{rec}</p>
+        <div className="recommend-sections">
+          {recommendationSections.map((section) => (
+            <div key={section.title} className="recommend-section">
+              <h3>{section.title}</h3>
+              {section.items.map((rec, idx) => (
+                <div key={idx} className="recommend-card">
+                  <span>✓</span>
+                  <p>{rec}</p>
+                </div>
+              ))}
             </div>
           ))}
         </div>

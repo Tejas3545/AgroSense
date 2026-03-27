@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion' // eslint-disable-line no-unused-vars
 import { t } from '../translations'
-import { SunIcon, WaterIcon, EarthIcon, TemperatureIcon, NutritionIcon, BugIcon, CheckIcon } from './SeasonalIcons'
+import { SunIcon, WaterIcon, EarthIcon, TemperatureIcon, NutritionIcon, BugIcon } from './SeasonalIcons'
 
 const getBasicTips = (language) => [
   {
@@ -15,7 +15,8 @@ const getBasicTips = (language) => [
       'Place plants in bright, indirect light for 6-8 hours daily',
       'Rotate pots weekly to ensure even growth on all sides',
       'Keep plants away from direct harsh afternoon sun to prevent leaf burn',
-      'For low-light areas, consider grow lights or low-light tolerant plants'
+      'For low-light areas, consider grow lights or low-light tolerant plants',
+      'Track leaf color and internode length to detect light stress early and adjust placement'
     ]
   },
   {
@@ -30,7 +31,8 @@ const getBasicTips = (language) => [
       'Water when the top inch of soil feels dry to the touch',
       'Use room-temperature water to avoid shocking the roots',
       'Water until it drains from the bottom holes, then empty the saucer',
-      'Morning watering is ideal; avoid wetting leaves to prevent fungal issues'
+      'Morning watering is ideal; avoid wetting leaves to prevent fungal issues',
+      'Use a fixed weekly observation routine: soil check, leaf firmness, and pot weight before watering'
     ]
   },
   {
@@ -43,7 +45,8 @@ const getBasicTips = (language) => [
     ] : [
       'Use well-draining potting mix with added perlite or orchid bark',
       'Choose pots with drainage holes to prevent root rot',
-      'Repot plants in spring when they outgrow their containers'
+      'Repot plants in spring when they outgrow their containers',
+      'Refresh top 2-3 cm soil monthly to improve aeration and reduce salt buildup from fertilizers'
     ]
   },
   {
@@ -56,7 +59,8 @@ const getBasicTips = (language) => [
     ] : [
       'Most houseplants prefer 40-60% humidity levels',
       'Mist leaves weekly or place on pebble trays filled with water',
-      'Keep plants away from heating vents, air conditioners, and cold drafts'
+      'Keep plants away from heating vents, air conditioners, and cold drafts',
+      'Stabilize room temperature swings by keeping plants away from windows with direct night chill'
     ]
   },
   {
@@ -69,7 +73,8 @@ const getBasicTips = (language) => [
     ] : [
       'Feed plants during growing season (spring/summer) every 2-4 weeks',
       'Use balanced fertilizer (like 10-10-10) for general care',
-      'Reduce or stop fertilizing in fall and winter dormancy'
+      'Reduce or stop fertilizing in fall and winter dormancy',
+      'Flush soil every 4-6 weeks with plain water to prevent nutrient salt accumulation'
     ]
   },
   {
@@ -82,20 +87,8 @@ const getBasicTips = (language) => [
     ] : [
       'Inspect new plants before bringing them home to avoid pests',
       'Wipe leaves monthly with a soft, damp cloth to remove dust',
-      'Isolate any infested plant immediately from other plants'
-    ]
-  },
-  {
-    category: language === 'gujarati' ? 'સામાન્ય દિનચર્યા' : 'General Routine',
-    Icon: CheckIcon,
-    tips: language === 'gujarati' ? [
-      'અઠવાડિયામાં 2-3 વખત માટીની ભેજ તપાસો',
-      'જીવાતો માટે સાપ્તાહિક પાંદડા અને દાંડીઓનું નિરીક્ષણ કરો',
-      'મૃત અથવા પીળા પાંદડાને તરત કાપો'
-    ] : [
-      'Check soil moisture 2-3 times per week',
-      'Inspect leaves and stems weekly for pests or disease',
-      'Prune dead or yellowing leaves promptly'
+      'Isolate any infested plant immediately from other plants',
+      'Use yellow sticky traps during humid periods to monitor early pest activity'
     ]
   }
 ]

@@ -40,6 +40,19 @@ const ItemIcon = ({ id }) => {
   return icons[id] || icons.overview
 }
 
+const getScheduleTitle = (entry, idx) => {
+  if (entry.week) return String(entry.week)
+  if (entry.day) return `Day ${entry.day}`
+  return `Phase ${idx + 1}`
+}
+
+const getScheduleActions = (entry) => {
+  if (Array.isArray(entry.actions)) return entry.actions
+  if (typeof entry.actions === 'string' && entry.actions.trim()) return [entry.actions]
+  if (typeof entry.action === 'string' && entry.action.trim()) return [entry.action]
+  return []
+}
+
 export default function Accordion({ items, defaultOpen = null }) {
   const [openId, setOpenId] = useState(defaultOpen)
 
@@ -97,22 +110,16 @@ export default function Accordion({ items, defaultOpen = null }) {
                       <div className="accordion-schedule">
                         {item.schedule.map((entry, idx) => (
                           <div key={idx} className="accordion-schedule-item">
-                            <h5>{entry.week}</h5>
+                            <h5>{getScheduleTitle(entry, idx)}</h5>
                             <ul className="accordion-list compact">
-                              {Array.isArray(entry.actions) ? (
-                                entry.actions.map((action, actionIdx) => (
-                                  <li key={actionIdx}>
-                                    <span>•</span>
-                                    <span>{action}</span>
-                                  </li>
-                                ))
-                              ) : (
-                                <li>
+                              {getScheduleActions(entry).map((action, actionIdx) => (
+                                <li key={actionIdx}>
                                   <span>•</span>
-                                  <span>{entry.actions}</span>
+                                  <span>{action}</span>
                                 </li>
-                              )}
+                              ))}
                             </ul>
+                            {entry.notes && <p className="accordion-notes">{entry.notes}</p>}
                           </div>
                         ))}
                       </div>

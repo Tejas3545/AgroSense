@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion' // eslint-disable-line no-unused-vars
-import { useState } from 'react'
 import TreatmentPlan from './TreatmentPlan'
 import DetailedCareGuide from './DetailedCareGuide'
 import { t } from '../translations'
@@ -23,8 +22,6 @@ const DownloadIcon = ({ size = 16 }) => (
 )
 
 export default function AnalysisResults({ result, image, onReset, onDownload, onBack, language = 'english', isDownloading = false }) {
-    const [pdfLanguage, setPdfLanguage] = useState('english')
-    
     if (!result) return null
 
     const getSeverityColor = (imp) => {
@@ -58,15 +55,12 @@ export default function AnalysisResults({ result, image, onReset, onDownload, on
               <label>
                 <GlobeIcon size={16} /> {t('reportLanguage', language)}
               </label>
-              <select value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
-                <option value="english">English</option>
-                <option value="gujarati">ગુજરાતી</option>
-              </select>
-              <button className="btn-download" onClick={() => onDownload(pdfLanguage)} disabled={isDownloading}>
+              <div className="analysis-report-language">English</div>
+              <button className="btn-download" onClick={() => onDownload('english')} disabled={isDownloading}>
                 {isDownloading ? (
                   <><RefreshIcon /> {language === 'gujarati' ? 'તૈયાર કરી રહ્યા છીએ...' : 'Generating...'}</>
                 ) : (
-                  <><DownloadIcon size={16} /> {t('downloadReport', language)}</>
+                  <><DownloadIcon size={16} /> {language === 'gujarati' ? 'હેલ્થ રિપોર્ટ ડાઉનલોડ (English)' : 'Download Health Report (English)'}</>
                 )}
               </button>
             </div>
