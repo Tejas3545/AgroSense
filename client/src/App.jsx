@@ -56,13 +56,92 @@ function App() {
 
   const toggleTheme = () => setIsDark(!isDark)
 
+  const PROVIDER_STATUS_MESSAGES = {
+    quota_exceeded: 'quota exceeded',
+    missing_gemini_api_key: 'not configured',
+    missing_huggingface_api_key: 'not configured',
+    timeout: 'timed out',
+    model_loading_503: 'model warming up',
+    failed_or_unavailable: 'unavailable',
+    request_exception: 'unreachable',
+    json_parse_failed: 'invalid response',
+    json_missing_required_fields: 'invalid response',
+    json_not_object: 'invalid response',
+    api_call_failed: 'unavailable',
+    disabled: 'disabled',
+    unexpected_error: 'unexpected error'
+  }
+
+  const normalizeProviderCode = (status) => {
+    if (typeof status !== 'string') {
+      return 'failed_or_unavailable'
+    }
+
+    const normalized = status.trim().toLowerCase()
+
+    if (normalized.includes('quota') || normalized.includes('rate limit') || normalized.includes('resource exhausted') || normalized === 'http_429') {
+      return 'quota_exceeded'
+    }
+    if (normalized.startsWith('http_')) {
+      return normalized
+    }
+    if (PROVIDER_STATUS_MESSAGES[normalized]) {
+      return normalized
+    }
+
+    return 'failed_or_unavailable'
+  }
+
+  const hasProviderCode = (providerStatus, matcher) => {
+    if (!providerStatus || typeof providerStatus !== 'object') {
+      return false
+    }
+
+    const matchers = Array.isArray(matcher) ? matcher : [matcher]
+    return Object.values(providerStatus).some((status) => {
+      const code = normalizeProviderCode(status)
+      return matchers.includes(code)
+    })
+  }
+
   const formatProviderStatus = (providerStatus) => {
     if (!providerStatus || typeof providerStatus !== 'object') {
       return ''
     }
+
     return Object.entries(providerStatus)
-      .map(([provider, status]) => `${provider}: ${status}`)
+      .map(([provider, status]) => {
+        const code = normalizeProviderCode(status)
+        if (code.startsWith('http_')) {
+          return `${provider}: service error (${code.replace('http_', 'HTTP ')})`
+        }
+
+        return `${provider}: ${PROVIDER_STATUS_MESSAGES[code] || 'unavailable'}`
+      })
       .join(' | ')
+  }
+
+  const getUserFacingAnalysisError = (error) => {
+    const status = error?.status
+
+    if (status === 429 || hasProviderCode(error?.providerStatus, ['quota_exceeded', 'http_429'])) {
+      return 'AI analysis quota is currently exhausted. Please try again in a few minutes.'
+    }
+
+    if (error?.isMock) {
+      return 'Live AI analysis is temporarily unavailable. Please try again shortly.'
+    }
+
+    if (status === 503 || hasProviderCode(error?.providerStatus, ['api_call_failed', 'failed_or_unavailable'])) {
+      return 'Plant analysis service is temporarily unavailable. Please try again shortly.'
+    }
+
+    const raw = String(error?.message || '').toLowerCase()
+    if (raw.includes('all backend endpoints failed')) {
+      return 'Unable to reach the analysis service right now. Please try again shortly.'
+    }
+
+    return error?.message || 'Analysis failed.'
   }
 
   const fetchWithApiFallback = async (path, options) => {
@@ -184,9 +263,11 @@ function App() {
     } catch (error) {
       console.error('Analysis failed:', error)
       const providerStatusSummary = formatProviderStatus(error?.providerStatus)
-      const bannerMessage = providerStatusSummary
-        ? `${error.message} Provider status: ${providerStatusSummary}`
-        : error.message
+      const userMessage = getUserFacingAnalysisError(error)
+      const showDebugProviderStatus = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      const bannerMessage = showDebugProviderStatus && providerStatusSummary
+        ? `${userMessage} Provider status: ${providerStatusSummary}`
+        : userMessage
 
       setAnalysisError(bannerMessage)
       setUploadedImage(null)

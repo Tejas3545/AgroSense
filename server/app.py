@@ -564,16 +564,16 @@ Respond in JSON format:
                 }
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse Local LLM JSON: {e}")
-            _set_provider_error('local', f'json_parse_failed: {str(e)}')
+            _set_provider_error('local', 'json_parse_failed')
             return None
             
     except requests.exceptions.RequestException as e:
         logger.warning(f"Local LLM Studio not available: {e}")
-        _set_provider_error('local', f'request_exception: {str(e)}')
+        _set_provider_error('local', 'request_exception')
         return None
     except Exception as e:
         logger.exception(f"Local LLM error: {e}")
-        _set_provider_error('local', f'unexpected_error: {str(e)}')
+        _set_provider_error('local', 'unexpected_error')
         return None
 
 # ----------------------------------------------------------------------------
@@ -694,7 +694,7 @@ def analyze_with_huggingface_api(image_bytes: bytes) -> Optional[dict]:
         return None
     except Exception as e:
         logger.exception(f"Hugging Face API error: {e}")
-        _set_provider_error('hf', f'unexpected_error: {str(e)}')
+        _set_provider_error('hf', 'unexpected_error')
         return None
 
 # ----------------------------------------------------------------------------
@@ -976,12 +976,16 @@ def analyze_with_gemini(api_key: str, model: str, image_bytes: bytes, mime: str)
                 pass
 
             logger.exception(f'Gemini JSON parse failed: {e} | text={text[:200]}')
-            _set_provider_error('gemini', f'json_parse_failed: {str(e)}')
+            _set_provider_error('gemini', 'json_parse_failed')
             return None
         return None
     except Exception as e:
         logger.exception(f'Gemini API call failed: {e}')
-        _set_provider_error('gemini', f'api_call_failed: {str(e)}')
+        error_text = str(e).lower()
+        if any(token in error_text for token in ('429', 'quota', 'rate limit', 'resource exhausted')):
+            _set_provider_error('gemini', 'quota_exceeded')
+        else:
+            _set_provider_error('gemini', 'api_call_failed')
         return None
 
 
@@ -1416,7 +1420,7 @@ def analyze():
                 return jsonify(mock_result)
                 
         except Exception as e:
-            provider_status[provider_key] = f"error: {str(e)}"
+            provider_status[provider_key] = 'unexpected_error'
             logger.exception(f"❌ Provider '{provider_key}' failed with error: {e}")
             logger.info("Trying next provider...")
 
@@ -1430,8 +1434,10 @@ def analyze():
 
     return jsonify({
         'error': 'Real-time analysis is currently unavailable.',
-        'details': 'No AI provider could process this image. Configure GEMINI_API_KEY or HUGGINGFACE_API_KEY on the backend deployment.',
+        'details': 'No AI provider could process this image right now. Please retry shortly.',
         'provider_status': provider_status,
+        'error_code': 'analysis_unavailable',
+        'retryable': True,
         'is_mock': False
     }), 503
 
